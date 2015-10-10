@@ -10,9 +10,9 @@ if (document.title.indexOf("Stepic") != -1) {
 }
 
 function deface(){
-    document.getElementById('id_password1').parentNode.remove();
-    document.getElementById('id_password2').parentNode.remove();
-    document.getElementById('id_email').parentNode.remove();
+    // document.getElementById('id_password1').parentNode.remove();
+    // document.getElementById('id_password2').parentNode.remove();
+    // document.getElementById('id_email').parentNode.remove();
     document.getElementsByClassName('reg-form__right')[0].remove();
     document.getElementsByClassName('reg-form__title')[0].innerText = "Welcome to SECR.\nLet's play.";
     fields = document.getElementsByTagName('label');
@@ -26,8 +26,10 @@ function hacked_registration(){
     username = document.getElementById('id_first_name').value;
     //Field says: enter Email but that's okay, hacked here; email -> surname;
     //hash_email_generator() -> email;
-    usersurname = alert(document.getElementById('id_last_name').value);
-    alert(username, usersurname);
+    usersurname = document.getElementById('id_last_name').value;
+    email = document.getElementById('id_email').value = 'ABC123sfasf@gmail.com';
+    pass = document.getElementById('id_password1').value = '123456';
+    pass2 = document.getElementById('id_password2').value = '123456';
 }
 
 function replaceRegButton(){
