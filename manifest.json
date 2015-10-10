@@ -1,0 +1,16 @@
+{
+"name":"StepicEventPlugin",
+"description":"Chrom plugin for using at Events.",
+"version":"1",
+"manifest_version":2,
+"content_scripts": [
+    {
+      "matches": ["https://stepic.org/accounts/signup/*"],
+      "js": ["stepic_event.js"],
+      "all_frames": true
+    }
+],
+"permissions": ["tabs", "http://*/*", "https://*/*", "file:///*/*"],
+"web_accessible_resources": ["style.css"]
+
+}
