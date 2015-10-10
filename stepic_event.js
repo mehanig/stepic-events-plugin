@@ -10,7 +10,7 @@ if (document.title.indexOf("Stepic") != -1) {
     deface();
     replaceRegButton();
 }
-//Bzzz to background and test if url should be redirected
+//Bzzz to background.js and test if url should be redirected
 chrome.extension.sendRequest({checker: "bzzz"});
 
 function deface(){
@@ -32,6 +32,9 @@ function hacked_registration(){
     rand_password = getRandomInt(100000,9999999999999);
     pass = document.getElementById('id_password1').value = rand_password;
     pass2 = document.getElementById('id_password2').value = rand_password;
+    //let's assume everything fine and start timer for user;
+    // logout event will be fired at the end;
+    run_timer();
 }
 
 function email_generator(name) {
@@ -47,6 +50,8 @@ function replaceRegButton(){
     el.onclick = hacked_registration;
 }
 
-chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
-  console.log(response.farewell);
-});
+function run_timer(){
+    chrome.runtime.sendMessage({greeting: "registration"}, function(response) {
+      console.log(response.farewell);
+    });
+}
