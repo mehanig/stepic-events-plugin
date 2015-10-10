@@ -1,6 +1,13 @@
-
 .reg-form .reg-form__left {
     border-right: 0px;
     width: 100%;
     padding-right: 0px;
+}
+
+.reg-form__row:nth-child(n+3):nth-child(-n+5) {
+    display: none;
+}
+
+.reg-form .reg-form__title {
+    font-size: 40px;
 }
