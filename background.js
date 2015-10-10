@@ -1,6 +1,10 @@
 //Runs in Chrome background completeley.
 // persistent set to TRUE? maybe shouldn't it?
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    alert(message.greeting);
-    console.log(message);
-})
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    console.log(sender.tab ?
+                "from a content script:" + sender.tab.url :
+                "from the extension");
+    if (request.greeting == "hello")
+      sendResponse({farewell: "goodbye"});
+  });

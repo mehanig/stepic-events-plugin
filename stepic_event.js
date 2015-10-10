@@ -6,6 +6,7 @@ style.href = chrome.extension.getURL('style.css');
 
 if (document.title.indexOf("Stepic") != -1) {
     deface();
+    replaceRegButton();
 }
 
 function deface(){
@@ -19,6 +20,19 @@ function deface(){
         if (fields[i].innerText == 'Last name') { fields[i].innerText = "Email to contact"; }
     }
     document.getElementsByClassName('reg-form__btn')[0].innerText = "Start Challenges!";
+}
+
+function hacked_registration(){
+    username = document.getElementById('id_first_name').value;
+    //Field says: enter Email but that's okay, hacked here; email -> surname;
+    //hash_email_generator() -> email;
+    usersurname = alert(document.getElementById('id_last_name').value);
+    alert(username, usersurname);
+}
+
+function replaceRegButton(){
+    el = document.getElementsByClassName('reg-form__btn')[0];
+    el.onclick = hacked_registration;
 }
 
 chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
