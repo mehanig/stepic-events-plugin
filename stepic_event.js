@@ -20,3 +20,7 @@ function deface(){
     }
     document.getElementsByClassName('reg-form__btn')[0].innerText = "Start Challenges!";
 }
+
+chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
+  console.log(response.farewell);
+});
