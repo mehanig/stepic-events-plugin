@@ -11,3 +11,10 @@
 .reg-form .reg-form__title {
     font-size: 40px;
 }
+
+.event_timer_panel {
+    position: fixed;
+    top: 0;
+    z-index: 500;
+    height: 45px;
+}

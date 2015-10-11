@@ -1,33 +1,51 @@
 // persistent set to TRUE in manifest? maybe shouldn't it?
-
 'use strict;'
+
 var url_redirect = {
     from: 'https://stepic.org/accounts/signup/',
     to:   'https://stepic.org/accounts/signup/?next=/lesson/15767/'
 };
 
 var logout_path = 'https://stepic.org/accounts/logout/'
-var SESSION_TIME = 10000; // 10 sec
+var SESSION_TIME = 100000; // 100 sec
+
+var ACTIVE_SESSION = false;
+var REDRAW_INTERVAL = 1000; //1 sec
+var connection = null;
+var panel_redraw = null;
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         console.log(sender.tab ?
                     "from a content script:" + sender.tab.url :
                     "from the extension");
-        if (request.greeting == "hello") {
-            sendResponse({farewell: "goodbye"});
-        }
-        if (request.greeting == "registration") {
-            sendResponse({farewell: "start"});
+        if (request.greeting == "start_timer") {
+            ACTIVE_SESSION = SESSION_TIME;
             session_timer(SESSION_TIME, sender);
+            // draw_session_panel_message(sender, sendResponse);
+            panel_redraw = setInterval(panel_draw, REDRAW_INTERVAL);
         }
-        //Not used yet
-        // if (request.greeting == "logout"){
-        //     console.log('Logging out user');
-        // }
 });
 
-//Listener and actions
+function panel_draw(){
+    if (ACTIVE_SESSION != false && (connection != null) ){
+        ACTIVE_SESSION -= REDRAW_INTERVAL;
+        connection.postMessage({redraw: true, time: ACTIVE_SESSION});
+    }
+}
+
+chrome.runtime.onConnect.addListener(function(port) {
+  console.assert(port.name == "panel_render");
+  connection = port;
+  port.onMessage.addListener(function(msg) {
+      if (1 == 2){
+          console.log('hmm');
+          port.postMessage({answer: "Madame... Bovary"});
+      }
+  });
+});
+
+//REDIRECTS
 chrome.extension.onRequest.addListener(function(request, sender) {
     //replaces url to redirect user to quiz after login
     if (sender.tab.url.startsWith(url_redirect.from) &&
@@ -37,9 +55,9 @@ chrome.extension.onRequest.addListener(function(request, sender) {
 });
 
 function session_timer(session_time, sender) {
-    console.log('running!');
     setTimeout( function(){
         console.log('Ended; logging out');
         chrome.tabs.update(sender.tab.id, {url: logout_path});
+        ACTIVE_SESSION = false;
     }  , SESSION_TIME );
 }
