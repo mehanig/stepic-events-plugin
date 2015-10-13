@@ -27,23 +27,19 @@ chrome.runtime.onMessage.addListener(
         }
 });
 
+
+
 function panel_draw(){
     if (ACTIVE_SESSION != false && (connection != null) ){
         ACTIVE_SESSION -= REDRAW_INTERVAL;
-        connection.postMessage({redraw: true, time: ACTIVE_SESSION});
+        chrome.tabs.query({}, function(tabs) {
+            var message = {redraw: true, time: ACTIVE_SESSION};
+            for (var i=0; i<tabs.length; ++i) {
+                chrome.tabs.sendMessage(tabs[i].id, message);
+            }
+        });
     }
 }
-
-chrome.runtime.onConnect.addListener(function(port) {
-  console.assert(port.name == "panel_render");
-  connection = port;
-  port.onMessage.addListener(function(msg) {
-      if (1 == 2){
-          console.log('hmm');
-          port.postMessage({answer: "Madame... Bovary"});
-      }
-  });
-});
 
 //REDIRECTS
 chrome.extension.onRequest.addListener(function(request, sender) {
@@ -52,7 +48,6 @@ chrome.extension.onRequest.addListener(function(request, sender) {
             sender.tab.url != url_redirect.to) {
                 chrome.tabs.update(sender.tab.id, {url: url_redirect.to});
     }
-
 });
 
  chrome.webRequest.onBeforeRedirect.addListener(

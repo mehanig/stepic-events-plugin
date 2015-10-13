@@ -11,8 +11,8 @@ chrome.extension.sendRequest({checker: "bzzz"});
 
 
 //main channel for communication and events firing, connection is always opened
-var port = chrome.runtime.connect({name: "panel_render"});
-port.postMessage({connection: 'bzzz'});
+// var port = chrome.runtime.connect({name: "panel_render"});
+// port.postMessage({connection: 'bzzz'});
 
 if (document.title.indexOf("Stepic") != -1) {
     deface();
@@ -87,11 +87,11 @@ function hacked_registration(){
     });
 }
 
-port.onMessage.addListener(function(msg) {
+chrome.runtime.onMessage.addListener(function(msg) {
     if (msg.redraw == true) {
         skip_tutorial();
         panel_update_or_create(msg.time / 1000);
-        port.postMessage({redraw_result:true});
+        chrome.runtime.sendMessage({redraw_result:true});
     }
 });
 
@@ -102,12 +102,3 @@ function email_generator(name) {
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
-
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
-    if(request.start_timer)
-    {
-        console.log('Received Start');
-        alert(request);
-        console.log('Received End');
-    }
-});
