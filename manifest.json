@@ -6,7 +6,7 @@
 "content_scripts": [
     {
       "matches": ["https://stepic.org/*"],
-      "js": ["stepic_event.js"],
+      "js": ["js_libs/jquery.min.js", "stepic_event.js"],
       "all_frames": true
     }
 ],
@@ -14,7 +14,7 @@
   "scripts": ["background.js"],
   "persistent": true
 },
-"permissions": ["tabs", "http://*/*", "https://*/*", "file:///*/*"],
-"web_accessible_resources": ["style.css"]
+"permissions": ["tabs", "webRequest", "webRequestBlocking", "http://*/*", "https://*/*", "file:///*/*"],
+"web_accessible_resources": ["style.css", "js_libs/jquery.min.js"]
 
 }

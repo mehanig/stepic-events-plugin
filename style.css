@@ -18,3 +18,7 @@
     z-index: 500;
     height: 45px;
 }
+
+.introjs-overlay, .introjs-helpLayer, .introjs-tooltipReferenceLayer {
+    display: none;
+}

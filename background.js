@@ -12,6 +12,7 @@ var SESSION_TIME = 100000; // 100 sec
 var ACTIVE_SESSION = false;
 var REDRAW_INTERVAL = 1000; //1 sec
 var connection = null;
+var StepicTabs = [];
 var panel_redraw = null;
 
 chrome.runtime.onMessage.addListener(
@@ -22,7 +23,6 @@ chrome.runtime.onMessage.addListener(
         if (request.greeting == "start_timer") {
             ACTIVE_SESSION = SESSION_TIME;
             session_timer(SESSION_TIME, sender);
-            // draw_session_panel_message(sender, sendResponse);
             panel_redraw = setInterval(panel_draw, REDRAW_INTERVAL);
         }
 });
@@ -48,11 +48,24 @@ chrome.runtime.onConnect.addListener(function(port) {
 //REDIRECTS
 chrome.extension.onRequest.addListener(function(request, sender) {
     //replaces url to redirect user to quiz after login
-    if (sender.tab.url.startsWith(url_redirect.from) &&
-        sender.tab.url != url_redirect.to) {
-            chrome.tabs.update(sender.tab.id, {url: url_redirect.to});
-        }
+        if (sender.tab.url.startsWith(url_redirect.from) &&
+            sender.tab.url != url_redirect.to) {
+                chrome.tabs.update(sender.tab.id, {url: url_redirect.to});
+    }
+
 });
+
+ chrome.webRequest.onBeforeRedirect.addListener(
+    function(details) {
+        if (details.method == 'POST' && details.url == logout_path && details.statusCode == 302){
+            console.log(details.url, details.method, details.statusCode);
+            ACTIVE_SESSION = false;
+            clearTimeout(panel_redraw);
+
+        }
+    },
+    {urls: ["<all_urls>"]},
+    ["responseHeaders"]);
 
 function session_timer(session_time, sender) {
     setTimeout( function(){
