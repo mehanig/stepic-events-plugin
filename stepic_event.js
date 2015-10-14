@@ -96,7 +96,6 @@ chrome.runtime.onMessage.addListener(function(msg) {
             url : 'https://stepic.org/accounts/logout/',
             type: "POST",
             data : {csrfmiddlewaretoken: getCookie("csrftoken")},
-            dataType : "json",
             success: handler,
             error: handler
         });
