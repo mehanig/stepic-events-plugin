@@ -7,12 +7,10 @@ var url_redirect = {
 };
 
 var logout_path = 'https://stepic.org/accounts/logout/'
-var SESSION_TIME = 100000; // 100 sec
+var SESSION_TIME = 10000; // 10 sec
 
 var ACTIVE_SESSION = false;
 var REDRAW_INTERVAL = 1000; //1 sec
-var connection = null;
-var StepicTabs = [];
 var panel_redraw = null;
 
 chrome.runtime.onMessage.addListener(
@@ -27,10 +25,8 @@ chrome.runtime.onMessage.addListener(
         }
 });
 
-
-
 function panel_draw(){
-    if (ACTIVE_SESSION != false && (connection != null) ){
+    if (ACTIVE_SESSION != false){
         ACTIVE_SESSION -= REDRAW_INTERVAL;
         chrome.tabs.query({}, function(tabs) {
             var message = {redraw: true, time: ACTIVE_SESSION};
@@ -43,8 +39,13 @@ function panel_draw(){
 
 //REDIRECTS
 chrome.extension.onRequest.addListener(function(request, sender) {
+    //requests after session timer
+    if (request.redirect){
+        chrome.tabs.update(sender.tab.id, {url: request.redirect});
+    }
     //replaces url to redirect user to quiz after login
-        if (sender.tab.url.startsWith(url_redirect.from) &&
+    // handles request from checker: bzzz
+    if (sender.tab.url.startsWith(url_redirect.from) &&
             sender.tab.url != url_redirect.to) {
                 chrome.tabs.update(sender.tab.id, {url: url_redirect.to});
     }
@@ -53,10 +54,8 @@ chrome.extension.onRequest.addListener(function(request, sender) {
  chrome.webRequest.onBeforeRedirect.addListener(
     function(details) {
         if (details.method == 'POST' && details.url == logout_path && details.statusCode == 302){
-            console.log(details.url, details.method, details.statusCode);
             ACTIVE_SESSION = false;
             clearTimeout(panel_redraw);
-
         }
     },
     {urls: ["<all_urls>"]},
@@ -64,8 +63,13 @@ chrome.extension.onRequest.addListener(function(request, sender) {
 
 function session_timer(session_time, sender) {
     setTimeout( function(){
-        console.log('Ended; logging out');
-        chrome.tabs.update(sender.tab.id, {url: logout_path});
         ACTIVE_SESSION = false;
+        clearTimeout(panel_redraw);
+        chrome.tabs.query({}, function(tabs) {
+            var message = {logout: true, url: logout_path};
+            for (var i=0; i<tabs.length; ++i) {
+                chrome.tabs.sendMessage(tabs[i].id, message);
+            }
+        });
     }  , SESSION_TIME );
 }

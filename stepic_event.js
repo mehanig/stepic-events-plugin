@@ -10,10 +10,6 @@ style.href = chrome.extension.getURL('style.css');
 chrome.extension.sendRequest({checker: "bzzz"});
 
 
-//main channel for communication and events firing, connection is always opened
-// var port = chrome.runtime.connect({name: "panel_render"});
-// port.postMessage({connection: 'bzzz'});
-
 if (document.title.indexOf("Stepic") != -1) {
     deface();
     replaceRegButton();
@@ -92,8 +88,35 @@ chrome.runtime.onMessage.addListener(function(msg) {
         skip_tutorial();
         panel_update_or_create(msg.time / 1000);
         chrome.runtime.sendMessage({redraw_result:true});
+    } else if (msg.logout == true) {
+        var handler = function(data) {
+            chrome.extension.sendRequest({redirect: "https://stepic.org"});
+        };
+        $.ajax({
+            url : 'https://stepic.org/accounts/logout/',
+            type: "POST",
+            data : {csrfmiddlewaretoken: getCookie("csrftoken")},
+            dataType : "json",
+            success: handler,
+            error: handler
+        });
     }
 });
+
+function getCookie(c_name) {
+    if (document.cookie.length > 0) {
+        c_start = document.cookie.indexOf(c_name + "=");
+        if (c_start != -1) {
+            c_start = c_start + c_name.length + 1;
+            c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) {
+                c_end = document.cookie.length;
+            }
+            return unescape(document.cookie.substring(c_start,c_end));
+        }
+    }
+    return "";
+}
 
 function email_generator(name) {
     return name + (new Date).getTime() + '@test.com';
